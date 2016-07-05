@@ -1,17 +1,25 @@
 public enum CountryIbanFormat {
-    DE("Germany", "1314", 8, 10),
-    AT("Austria", "1029", 5, 11);
+    DE("Germany", 8, BankCodeFormat.n, 10),
+    AT("Austria", 5, BankCodeFormat.n, 11),
+    NL("Netherlands", 4, BankCodeFormat.a, 10);
+
+    static enum BankCodeFormat {
+        /**digits*/
+        n,
+        /**upper case characters*/
+        a;
+    }
 
     private String description;
-    private String numberRepresentation;
     private int bankCodeLength;
+    private BankCodeFormat bankCodeFormat;
     private int accountNumberLength;
     private int fullLenght;
 
-    CountryIbanFormat(String description, String numberRepresentation, int bankCodeLength, int accountNumberLength) {
+    CountryIbanFormat(String description, int bankCodeLength, BankCodeFormat bankCodeFormat, int accountNumberLength) {
         this.description = description;
-        this.numberRepresentation = numberRepresentation;
         this.bankCodeLength = bankCodeLength;
+        this.bankCodeFormat = bankCodeFormat;
         this.accountNumberLength = accountNumberLength;
         /**4 is for 2 country letters an 2 check digits*/
         this.fullLenght = 4 + bankCodeLength + accountNumberLength;
@@ -19,10 +27,6 @@ public enum CountryIbanFormat {
 
     public String getDescription() {
         return description;
-    }
-
-    public String getNumberRepresentation() {
-        return numberRepresentation;
     }
 
     public int getBankCodeLength() {
@@ -35,5 +39,9 @@ public enum CountryIbanFormat {
 
     public int getFullLenght() {
         return fullLenght;
+    }
+
+    public BankCodeFormat getBankCodeFormat() {
+        return bankCodeFormat;
     }
 }

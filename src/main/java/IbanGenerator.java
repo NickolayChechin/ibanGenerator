@@ -6,7 +6,7 @@ public class IbanGenerator {
     private static final int MOD = 97;
 
     private long accountNumbersCounter = 1L;
-    private long bankCodesCounter = 1;
+    private long bankCodesCounter = 1L;
 
     private static final IbanGenerator INSTANCE = new IbanGenerator();
 
@@ -20,7 +20,7 @@ public class IbanGenerator {
     public Iban getIban(CountryIbanFormat countryIbanFormat) {
         Iban iban = new Iban();
         iban.setCountryIbanFormat(countryIbanFormat);
-        BankCodeAccountNumber bankCodeAccountNumber = generateBankCodeAccountNumber(countryIbanFormat.getBankCodeLength(), countryIbanFormat.getAccountNumberLength());
+        BankCodeAccountNumber bankCodeAccountNumber = generateBankCodeAccountNumber(countryIbanFormat.getBankCodeLength(), countryIbanFormat.getBankCodeFormat(), countryIbanFormat.getAccountNumberLength());
         iban.setBankCode(bankCodeAccountNumber.getBankCode());
         iban.setAccountNumber(bankCodeAccountNumber.getAccountNumber());
         iban.setCheckDigits(DEFAULT_CHECK_DIGITS);
@@ -30,16 +30,26 @@ public class IbanGenerator {
     }
 
     private String calculateCheckDigits(String ibanRawValue) {
-        int mod = calculateMod(ibanRawValue);
+        String numericIbanRawValue = replaceCharsWithNumbers(ibanRawValue);
+        int mod = calculateMod(numericIbanRawValue);
         int checkDigit = 98 - mod;
         String checkDigitString = Integer.valueOf(checkDigit).toString();
         return checkDigit > 9 ? checkDigitString : "0" + checkDigitString;
 
     }
 
+    private String replaceCharsWithNumbers(String ibanRawValue) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ibanRawValue.length(); i++) {
+            int numericValue = Character.getNumericValue(ibanRawValue.charAt(i));
+            sb.append(numericValue);
+        }
+        return sb.toString();
+    }
+
     public boolean isValid(Iban iban) {
         boolean lengthIsValid = iban.toString().length() == iban.getCountryIbanFormat().getFullLenght();
-        boolean checkNumbersIsValid = calculateMod(iban.getRawValue()) == 1;
+        boolean checkNumbersIsValid = calculateMod(replaceCharsWithNumbers(iban.getRawValue())) == 1;
         return lengthIsValid && checkNumbersIsValid;
     }
 
@@ -63,7 +73,7 @@ public class IbanGenerator {
         return mod;
     }
 
-    private BankCodeAccountNumber generateBankCodeAccountNumber(int bankCodeLength, int accountNumberLength) {
+    private BankCodeAccountNumber generateBankCodeAccountNumber(int bankCodeLength, CountryIbanFormat.BankCodeFormat bankCodeFormat, int accountNumberLength) {
 
         long accountNumber;
         if (accountNumbersCounter < MAX_ACCOUNT_NUMBER) {
@@ -77,11 +87,27 @@ public class IbanGenerator {
             throw new RuntimeException("All possible Ibans have been generated");
         }
         long bankCode = bankCodesCounter;
+        String stringBankCode = "";
+        if(bankCodeFormat == CountryIbanFormat.BankCodeFormat.a){
+            stringBankCode = toBase26(bankCode);
+            stringBankCode = fillWithA(bankCodeLength, stringBankCode);
+        } else if (bankCodeFormat == CountryIbanFormat.BankCodeFormat.n){
+            stringBankCode = fillWithZeros(bankCodeLength, bankCode);
+        }
 
         String stringAccountNumber = fillWithZeros(accountNumberLength, accountNumber);
-        String stringBankCode = fillWithZeros(bankCodeLength, bankCode);
+
 
         return new BankCodeAccountNumber(stringBankCode, stringAccountNumber);
+    }
+
+    private String fillWithA(int stringLength, String string) {
+        StringBuilder sb = new StringBuilder("");
+        sb.append(string);
+        for (int i = 0; i < stringLength - String.valueOf(string).length(); i++) {
+            sb.insert(0, 'A');
+        }
+        return sb.toString();
     }
 
     private String fillWithZeros(int numberLength, long number) {
@@ -91,6 +117,24 @@ public class IbanGenerator {
             sb.insert(0, '0');
         }
         return sb.toString();
+    }
+
+
+    /**
+     * Converts a number to base 26
+     * <a href="https://en.wikipedia.org/w/index.php?title=Hexavigesimal&oldid=578218059#Bijective_base-26">Bijective base-26</a>.
+     *
+     */
+    private String toBase26(long n){
+        StringBuffer ret = new StringBuffer();
+        while(n>0){
+            --n;
+            ret.append((char)('A' + n%26));
+            n/=26;
+        }
+        // reverse the result, since its
+        // digits are in the wrong order
+        return ret.reverse().toString();
     }
 
     private static class BankCodeAccountNumber {

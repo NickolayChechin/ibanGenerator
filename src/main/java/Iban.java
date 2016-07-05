@@ -11,7 +11,7 @@ public class Iban {
         StringBuilder sb = new StringBuilder();
         sb.append(bankCode);
         sb.append(accountNumber);
-        sb.append(countryIbanFormat.getNumberRepresentation());
+        sb.append(countryIbanFormat);
         sb.append(checkDigits);
         return sb.toString();
     }

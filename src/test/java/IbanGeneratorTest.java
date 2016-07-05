@@ -39,4 +39,11 @@ public class IbanGeneratorTest {
         Iban deIban = ibanGenerator.getIban(CountryIbanFormat.DE);
         assertTrue(ibanGenerator.isValid(deIban));
     }
+
+    @Test
+    public void getNLIban(){
+        IbanGenerator ibanGenerator = IbanGenerator.getInstance();
+        Iban deIban = ibanGenerator.getIban(CountryIbanFormat.NL);
+        assertTrue(ibanGenerator.isValid(deIban));
+    }
 }
