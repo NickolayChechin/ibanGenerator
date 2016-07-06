@@ -50,19 +50,19 @@ public class IbanGeneratorTest {
     @Test
     public void multithreadingTest() throws InterruptedException {
         List<String> ibanList = Collections.synchronizedList(new ArrayList<String>());
-        IbanGeneratorTest.IbanGeneratorTester tester1 = new IbanGeneratorTest.IbanGeneratorTester(ibanList);
-        Thread thread1 = new Thread(tester1);
-        IbanGeneratorTest.IbanGeneratorTester tester2 = new IbanGeneratorTest.IbanGeneratorTester(ibanList);
-        Thread thread2 = new Thread(tester2);
-        IbanGeneratorTest.IbanGeneratorTester tester3 = new IbanGeneratorTest.IbanGeneratorTester(ibanList);
-        Thread thread3 = new Thread(tester3);
-        thread1.start();
-        thread2.start();
-        thread3.start();
-        thread1.join();
-        thread2.join();
-        thread3.join();
+        List<Thread> threadList = new ArrayList<Thread>();
+        for (int i = 0; i < 5; i++) {
+            IbanGeneratorTest.IbanGeneratorTester tester = new IbanGeneratorTest.IbanGeneratorTester(ibanList);
+            Thread thread = new Thread(tester);
+            thread.start();
+            threadList.add(thread);
+        }
+        for (Thread thread : threadList) {
+            thread.join();
+        }
+
         assertFalse(doesListContainDuplicates(ibanList));
+        assertEquals(ibanList.size(), 5000);
     }
 
     private static boolean doesListContainDuplicates(List<String> list) {

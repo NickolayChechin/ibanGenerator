@@ -77,4 +77,27 @@ public class Iban {
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Iban iban = (Iban) o;
+
+        if (countryIbanFormat != iban.countryIbanFormat) return false;
+        if (checkDigits != null ? !checkDigits.equals(iban.checkDigits) : iban.checkDigits != null) return false;
+        if (bankCode != null ? !bankCode.equals(iban.bankCode) : iban.bankCode != null) return false;
+        return accountNumber != null ? accountNumber.equals(iban.accountNumber) : iban.accountNumber == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = countryIbanFormat != null ? countryIbanFormat.hashCode() : 0;
+        result = 31 * result + (checkDigits != null ? checkDigits.hashCode() : 0);
+        result = 31 * result + (bankCode != null ? bankCode.hashCode() : 0);
+        result = 31 * result + (accountNumber != null ? accountNumber.hashCode() : 0);
+        return result;
+    }
 }
