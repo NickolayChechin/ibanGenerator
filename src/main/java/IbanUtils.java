@@ -1,7 +1,7 @@
 
 public class IbanUtils {
 
-    private static final int MOD = 97;
+    private static final int DIV = 97;
 
     public static String replaceCharsWithNumbers(String ibanRawValue) {
         StringBuilder sb = new StringBuilder();
@@ -20,19 +20,23 @@ public class IbanUtils {
 
     public static int calculateMod(String ibanRawValue) {
 
+        if(ibanRawValue.length() < 9){
+            return Integer.parseInt(ibanRawValue) % DIV;
+        }
+
         int N = Integer.parseInt(ibanRawValue.substring(0, 9));
-        int mod = N % MOD;
+        int mod = N % DIV;
 
         String restIbanRawValue = ibanRawValue.substring(9);
         while (restIbanRawValue.length() >= 7) {
             N = Integer.parseInt(mod + restIbanRawValue.substring(0, 7));
-            mod = N % MOD;
+            mod = N % DIV;
             restIbanRawValue = restIbanRawValue.substring(7);
         }
 
         if (restIbanRawValue.length() > 0) {
             N = Integer.parseInt(mod + restIbanRawValue);
-            mod = N % MOD;
+            mod = N % DIV;
         }
 
         return mod;

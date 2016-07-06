@@ -7,6 +7,17 @@ import static org.junit.Assert.*;
 public class IbanGeneratorTest {
 
     @Test
+    public void calculateMod(){
+        int mod =IbanUtils.calculateMod("3214282912345698765432161182");
+        assertEquals(mod, 1);
+    }
+    @Test
+    public void replaceCharsWithNumbers(){
+        String numericValue = IbanUtils.replaceCharsWithNumbers("WEST12345698765432GB82");
+        assertEquals(numericValue, "3214282912345698765432161182");
+    }
+
+    @Test
     public void ibanValidationFalse() {
         Iban iban = new Iban();
         iban.setCountryIbanFormat(CountryIbanFormat.DE);
