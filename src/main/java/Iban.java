@@ -4,10 +4,30 @@ public class Iban {
     private String checkDigits;
     private String bankCode;
     private String accountNumber;
-    /**a value without check digits*/
-    private String rawValue;
 
-    public String getRawValue(){
+    private static final String DEFAULT_CHECK_DIGITS = "00";
+
+    public Iban() {
+    }
+
+    public Iban(CountryIbanFormat countryIbanFormat, String bankCode, String accountNumber) {
+        this.countryIbanFormat = countryIbanFormat;
+        this.bankCode = bankCode;
+        this.accountNumber = accountNumber;
+        this.checkDigits = DEFAULT_CHECK_DIGITS;
+        this.checkDigits = calculateCheckDigits(getRawValue());
+    }
+
+    private String calculateCheckDigits(String ibanRawValue) {
+        String numericIbanRawValue = IbanUtils.replaceCharsWithNumbers(ibanRawValue);
+        int mod = IbanUtils.calculateMod(numericIbanRawValue);
+        int checkDigit = 98 - mod;
+        String checkDigitString = Integer.valueOf(checkDigit).toString();
+        return checkDigit > 9 ? checkDigitString : "0" + checkDigitString;
+
+    }
+
+    public String getRawValue() {
         StringBuilder sb = new StringBuilder();
         sb.append(bankCode);
         sb.append(accountNumber);
@@ -17,7 +37,7 @@ public class Iban {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(countryIbanFormat);
         sb.append(checkDigits);
