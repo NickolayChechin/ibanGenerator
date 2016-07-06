@@ -17,6 +17,7 @@ Code sample:
     //get Germany IBAN using CountryIbanFormat.DE
     //it's need to use CountryIbanFormat.AT and CountryIbanFormat.NL to get Austria and Netherlands IBANs respectively
     Iban iban = ibanGenerator.getIban(CountryIbanFormat.DE);
+    //each subsequent getIban call will return a new IBAN
     //String representatoin
     iban.toString(); //DE44000000010000000001
 ```
