@@ -2,9 +2,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class IbanGenerator {
 
-    private static final long MAX_ACCOUNT_NUMBER = 9999999999L;
-    private static final long MAX_BANK_CODE = 99999999;
-
     private AtomicLong accountNumbersCounter = new AtomicLong(1L);
     private AtomicLong bankCodesCounter = new AtomicLong(1L);
 
@@ -26,15 +23,25 @@ public class IbanGenerator {
     private BankCodeAccountNumber generateBankCodeAccountNumber(int bankCodeLength, CountryIbanFormat.BankCodeFormat bankCodeFormat, int accountNumberLength) {
 
         long accountNumber;
-        if (accountNumbersCounter.get() < MAX_ACCOUNT_NUMBER) {
+        long maxAccountNumber = getMaxValue(accountNumberLength);
+        long maxBankNumber;
+        if (bankCodeFormat == CountryIbanFormat.BankCodeFormat.a) {
+            String getMaxUpperCaseCharValue = getMaxUpperCaseCharValue(bankCodeLength);
+            maxBankNumber = fromBase26(getMaxUpperCaseCharValue);
+        } else {
+            maxBankNumber = getMaxValue(bankCodeLength);
+        }
+
+        if (accountNumbersCounter.get() <= maxAccountNumber) {
             accountNumber = accountNumbersCounter.getAndIncrement();
-        } else if (bankCodesCounter.get() < MAX_BANK_CODE) {
+        } else if (bankCodesCounter.get() <= maxBankNumber) {
             accountNumbersCounter = new AtomicLong(0L);
             accountNumber = accountNumbersCounter.getAndIncrement();
             bankCodesCounter.getAndIncrement();
         } else {
             throw new RuntimeException("All possible Ibans have been generated");
         }
+
         long bankCode = bankCodesCounter.get();
         String stringBankCode = "";
         if (bankCodeFormat == CountryIbanFormat.BankCodeFormat.a) {
@@ -48,6 +55,28 @@ public class IbanGenerator {
 
 
         return new BankCodeAccountNumber(stringBankCode, stringAccountNumber);
+    }
+
+    private long getMaxValue(int length) {
+        if (length > 18) {
+            throw new RuntimeException("bank code or account number length must be less or equal 18 digits");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append('9');
+        }
+        return Long.parseLong(sb.toString());
+    }
+
+    private String getMaxUpperCaseCharValue(int length) {
+        if (length > 13) {
+            throw new RuntimeException("bank code or account number length must be less or equal 18 digits");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append('Z');
+        }
+        return sb.toString();
     }
 
     private String fillWithA(int stringLength, String string) {
@@ -73,7 +102,7 @@ public class IbanGenerator {
      * Converts a number to base 26
      * <a href="https://en.wikipedia.org/w/index.php?title=Hexavigesimal&oldid=578218059#Bijective_base-26">Bijective base-26</a>.
      */
-    private String toBase26(long n) {
+    public String toBase26(long n) {
         StringBuilder ret = new StringBuilder();
         while (n > 0) {
             --n;
@@ -83,6 +112,18 @@ public class IbanGenerator {
         // reverse the result, since its
         // digits are in the wrong order
         return ret.reverse().toString();
+    }
+
+    public long fromBase26(String number) {
+        long n = 0;
+        if (number != null && number.length() > 0) {
+            n = (number.charAt(0) - 'A' + 1);
+            for (int i = 1; i < number.length(); i++) {
+                n *= 26;
+                n += (number.charAt(i) - 'A' + 1);
+            }
+        }
+        return n;
     }
 
     private static class BankCodeAccountNumber {
