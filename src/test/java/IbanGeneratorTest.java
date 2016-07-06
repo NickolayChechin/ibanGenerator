@@ -38,6 +38,46 @@ public class IbanGeneratorTest {
     }
 
     @Test
+    public void ibanValidationATFalse() {
+        Iban iban = new Iban();
+        iban.setCountryIbanFormat(CountryIbanFormat.AT);
+        iban.setBankCode("50010517");
+        iban.setAccountNumber("0123456789");
+        iban.setCheckDigits("41");
+        assertFalse(IbanUtils.isValid(iban));
+    }
+
+    @Test
+    public void ibanValidationATTrue() {
+        Iban iban = new Iban();
+        iban.setCountryIbanFormat(CountryIbanFormat.AT);
+        iban.setBankCode("19043");
+        iban.setAccountNumber("00234573201");
+        iban.setCheckDigits("61");
+        assertTrue(IbanUtils.isValid(iban));
+    }
+
+    @Test
+    public void ibanValidationNLFalse() {
+        Iban iban = new Iban();
+        iban.setCountryIbanFormat(CountryIbanFormat.NL);
+        iban.setBankCode("50010517");
+        iban.setAccountNumber("0123456789");
+        iban.setCheckDigits("41");
+        assertFalse(IbanUtils.isValid(iban));
+    }
+
+    @Test
+    public void ibanValidationNLTrue() {
+        Iban iban = new Iban();
+        iban.setCountryIbanFormat(CountryIbanFormat.NL);
+        iban.setBankCode("ABNA");
+        iban.setAccountNumber("0417164300");
+        iban.setCheckDigits("91");
+        assertTrue(IbanUtils.isValid(iban));
+    }
+
+    @Test
     public void getATIban() {
         IbanGenerator ibanGenerator = IbanGenerator.getInstance();
         Iban atIban = ibanGenerator.getIban(CountryIbanFormat.AT);
@@ -60,8 +100,8 @@ public class IbanGeneratorTest {
 
     @Test
     public void multithreadingTest() throws InterruptedException {
-        List<String> ibanList = Collections.synchronizedList(new ArrayList<String>());
-        List<Thread> threadList = new ArrayList<Thread>();
+        List<String> ibanList = Collections.synchronizedList(new ArrayList<>());
+        List<Thread> threadList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             IbanGeneratorTest.IbanGeneratorTester tester = new IbanGeneratorTest.IbanGeneratorTester(ibanList);
             Thread thread = new Thread(tester);
@@ -77,7 +117,7 @@ public class IbanGeneratorTest {
     }
 
     private static boolean doesListContainDuplicates(List<String> list) {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         for (String value : list) {
             if (!set.add(value)) {
                 return true;

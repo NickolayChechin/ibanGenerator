@@ -1,8 +1,15 @@
-
+/**
+ * Utility class
+ */
 public class IbanUtils {
 
     private static final int DIV = 97;
 
+    /**
+     * Replaces characters with numbers where A is 10, B is 11, etc
+     * @param ibanRawValue
+     * @return numeric string
+     */
     public static String replaceCharsWithNumbers(String ibanRawValue) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ibanRawValue.length(); i++) {
@@ -12,12 +19,22 @@ public class IbanUtils {
         return sb.toString();
     }
 
+    /**
+     * Validates Iban
+     * @param iban
+     * @return true if Iban is valid
+     */
     public static boolean isValid(Iban iban) {
         boolean lengthIsValid = iban.toString().length() == iban.getCountryIbanFormat().getFullLenght();
         boolean checkNumbersIsValid = calculateMod(replaceCharsWithNumbers(iban.getRawValue())) == 1;
         return lengthIsValid && checkNumbersIsValid;
     }
 
+    /**
+     * Calculates Iban's modulo
+     * @param ibanRawValue
+     * @return modulo
+     */
     public static int calculateMod(String ibanRawValue) {
 
         if(ibanRawValue.length() < 9){

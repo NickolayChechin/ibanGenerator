@@ -1,5 +1,8 @@
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Iban generator
+ */
 public class IbanGenerator {
 
     private AtomicLong accountNumbersCounter = new AtomicLong(1L);
@@ -14,6 +17,11 @@ public class IbanGenerator {
         return INSTANCE;
     }
 
+    /**
+     * Returns Iban instance according countryIbanFormat
+     * @param countryIbanFormat
+     * @return Iban
+     */
     public Iban getIban(CountryIbanFormat countryIbanFormat) {
         BankCodeAccountNumber bankCodeAccountNumber = generateBankCodeAccountNumber(countryIbanFormat.getBankCodeLength(), countryIbanFormat.getBankCodeFormat(), countryIbanFormat.getAccountNumberLength());
         Iban iban = new Iban(countryIbanFormat, bankCodeAccountNumber.getBankCode(), bankCodeAccountNumber.getAccountNumber());
@@ -99,10 +107,11 @@ public class IbanGenerator {
 
 
     /**
-     * Converts a number to base 26
-     * <a href="https://en.wikipedia.org/w/index.php?title=Hexavigesimal&oldid=578218059#Bijective_base-26">Bijective base-26</a>.
+     * Converts a number to base-26 character sequence
+     * @param n base-10 number
+     * @return base-26 character sequence
      */
-    public String toBase26(long n) {
+    private String toBase26(long n) {
         StringBuilder ret = new StringBuilder();
         while (n > 0) {
             --n;
@@ -114,6 +123,11 @@ public class IbanGenerator {
         return ret.reverse().toString();
     }
 
+    /**
+     * Converts base-26 character sequence to a number
+     * @param number in base-26
+     * @return base-10 number
+     */
     public long fromBase26(String number) {
         long n = 0;
         if (number != null && number.length() > 0) {
@@ -126,6 +140,9 @@ public class IbanGenerator {
         return n;
     }
 
+    /**
+     * Just a DTO for bank code and account number
+     */
     private static class BankCodeAccountNumber {
 
         private String bankCode;

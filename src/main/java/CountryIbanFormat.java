@@ -1,9 +1,12 @@
+/**
+ * Holds Iban formats for specific countries
+ */
 public enum CountryIbanFormat {
     DE("Germany", 8, BankCodeFormat.n, 10),
     AT("Austria", 5, BankCodeFormat.n, 11),
     NL("Netherlands", 4, BankCodeFormat.a, 10);
 
-    static enum BankCodeFormat {
+    enum BankCodeFormat {
         /**digits*/
         n,
         /**upper case characters*/

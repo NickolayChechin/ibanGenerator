@@ -1,3 +1,6 @@
+/**
+ * Iban
+ */
 public class Iban {
 
     private CountryIbanFormat countryIbanFormat;
@@ -27,6 +30,10 @@ public class Iban {
 
     }
 
+    /**
+     * Returns raw Iban for calculating check digits and validation
+     * @return raw string Iban representation
+     */
     public String getRawValue() {
         StringBuilder sb = new StringBuilder();
         sb.append(bankCode);
